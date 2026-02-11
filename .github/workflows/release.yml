@@ -1,0 +1,61 @@
+name: Auto-release
+
+on:
+  push:
+    tags:
+      # Publish on any tag starting with a `v`, e.g., v0.1.0
+      - v*
+
+jobs:
+  new-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    outputs:
+      version_changed: ${{ steps.version-check.outputs.version_changed }}
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Needed to get all tags for version comparison
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.*"
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
+
+    - name: Create GitHub Release
+      if: steps.version-check.outputs.version_changed == 'true'
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ steps.version-check.outputs.current_version }}
+        name: Release v${{ steps.version-check.outputs.current_version }}
+        draft: false
+        prerelease: false
+        generate_release_notes: true
+
+    - name: Create Sentry release
+      uses: getsentry/action-release@v3
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+        SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      with:
+        environment: production
+
+    # Trigger PyPI workflow when after we create a release.
+    # Pypi workflow won't with the usual on-release trigger
+    # because another workflow (this one) created the release. (avoiding inf recursion)
+    - name: Trigger PyPI workflow
+      if: steps.version-check.outputs.version_changed == 'true'
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        event-type: new-release-created
+        client-payload: '{"version": "${{ steps.version-check.outputs.current_version }}"}'

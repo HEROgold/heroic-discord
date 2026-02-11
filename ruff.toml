@@ -1,0 +1,15 @@
+# Ruff configuration
+# https://docs.astral.sh/ruff/
+
+# Enable all rules by default
+lint.select = ["ALL"]
+
+# Set line length
+line-length = 100
+
+# Python version
+target-version = "py314"
+
+[lint.per-file-ignores]
+# Disable print (T201) and assert (S101) checks in tests
+"tests/**" = ["T201", "S101"]
