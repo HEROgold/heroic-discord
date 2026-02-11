@@ -2,4 +2,4 @@
 
 from herogold.log import logging
 
-base_logger = logging.getLogger("heroic_discord")
+base_logger = logging.logger.getChild("heroic_discord")

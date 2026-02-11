@@ -70,9 +70,7 @@ class DiscordClient:
         """Context manager exit - closes the client."""
         if exc_type is not None and exc_val is not None:
             logger.error(
-                "Exception occurred in DiscordClient context: %s: %s",
-                exc_type.__name__,
-                exc_val,
+                t"Exception occurred in DiscordClient context: {exc_type.__name__}: {exc_val}",
                 exc_info=(exc_type, exc_val, exc_tb),
             )
         self.close()
@@ -279,9 +277,7 @@ class AsyncDiscordClient:
         """Async context manager exit - closes the client."""
         if exc_type is not None and exc_val is not None:
             logger.error(
-                "Exception occurred in AsyncDiscordClient context: %s: %s",
-                exc_type.__name__,
-                exc_val,
+                t"Exception occurred in AsyncDiscordClient context: {exc_type.__name__}: {exc_val}",
                 exc_info=(exc_type, exc_val, exc_tb),
             )
         await self.close()
