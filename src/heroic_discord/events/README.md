@@ -7,37 +7,43 @@ This module provides comprehensive type definitions and structures for Discord's
 Discord events allow your app to receive real-time updates about actions happening in servers, channels, and user interactions. There are two primary methods to receive events:
 
 ### Gateway Events (WebSocket)
+
 Gateway events are sent over persistent WebSocket connections and provide real-time updates. They are the primary way apps receive events from Discord.
 
 **Key Features:**
+
 - Real-time bidirectional communication
 - Requires maintaining a persistent connection
 - Supports heartbeating, resuming, and sharding
 - Controlled by Gateway Intents
 
 **Use Cases:**
+
 - Real-time message monitoring
 - User presence tracking
 - Voice state changes
 - Most Discord resource updates
 
 ### Webhook Events (HTTP)
+
 Webhook events are sent to your app's configured URL over HTTP when specific lifecycle events occur.
 
 **Key Features:**
+
 - One-way communication from Discord to your app
 - No persistent connection required
 - Not real-time or guaranteed order
 - Limited event types
 
 **Use Cases:**
+
 - App authorization/deauthorization
 - Entitlement lifecycle (purchases, updates)
 - Social SDK messages (lobbies, direct messages)
 
 ## Module Structure
 
-```
+```tree
 events/
 ├── __init__.py           # Main exports and base types
 ├── base.py              # Common enums and base structures
@@ -55,6 +61,7 @@ events/
 ### Gateway Events
 
 #### Identifying with Gateway
+
 ```python
 from heroic_discord.events.gateway import IdentifyStructure, IdentifyConnectionProperties
 from heroic_discord.events.base import GatewayIntent
@@ -71,6 +78,7 @@ identify_payload: IdentifyStructure = {
 ```
 
 #### Handling Gateway Events
+
 ```python
 from heroic_discord.events.gateway import ReadyEventFields, MessageCreateExtraFields
 
@@ -88,6 +96,7 @@ def handle_message_create(event_data: MessageCreateExtraFields):
 ```
 
 #### Updating Presence
+
 ```python
 from heroic_discord.events.gateway import UpdatePresenceStructure, ActivityObject
 
@@ -105,6 +114,7 @@ presence: UpdatePresenceStructure = {
 ### Webhook Events
 
 #### Handling Application Authorization
+
 ```python
 from heroic_discord.events.webhook import ApplicationAuthorizedStructure
 
@@ -121,6 +131,7 @@ def handle_app_authorized(event_data: ApplicationAuthorizedStructure):
 ```
 
 #### Handling Entitlements
+
 ```python
 from heroic_discord.events.webhook import EntitlementCreateStructure
 
@@ -135,6 +146,7 @@ def handle_entitlement_create(event_data: EntitlementCreateStructure):
 Gateway Intents control which events your app receives over the Gateway connection. Some intents are privileged and require approval for verified apps.
 
 ### Standard Intents
+
 ```python
 from heroic_discord.events.base import GatewayIntent
 
@@ -147,7 +159,9 @@ intents = (
 ```
 
 ### Privileged Intents
+
 These require explicit approval:
+
 - `GUILD_MEMBERS` - Guild member events
 - `GUILD_PRESENCES` - User presence updates
 - `MESSAGE_CONTENT` - Message content access
@@ -155,6 +169,7 @@ These require explicit approval:
 ### Intent Coverage
 
 #### GUILDS (1 << 0)
+
 - GUILD_CREATE, GUILD_UPDATE, GUILD_DELETE
 - GUILD_ROLE_CREATE, GUILD_ROLE_UPDATE, GUILD_ROLE_DELETE
 - CHANNEL_CREATE, CHANNEL_UPDATE, CHANNEL_DELETE
@@ -163,12 +178,15 @@ These require explicit approval:
 - STAGE_INSTANCE_CREATE, STAGE_INSTANCE_UPDATE, STAGE_INSTANCE_DELETE
 
 #### GUILD_MEMBERS (1 << 1) - Privileged
+
 - GUILD_MEMBER_ADD, GUILD_MEMBER_UPDATE, GUILD_MEMBER_REMOVE
 
 #### GUILD_MESSAGES (1 << 9)
+
 - MESSAGE_CREATE, MESSAGE_UPDATE, MESSAGE_DELETE, MESSAGE_DELETE_BULK
 
 #### GUILD_MESSAGE_REACTIONS (1 << 10)
+
 - MESSAGE_REACTION_ADD, MESSAGE_REACTION_REMOVE
 - MESSAGE_REACTION_REMOVE_ALL, MESSAGE_REACTION_REMOVE_EMOJI
 
@@ -194,36 +212,43 @@ GatewayOpcode.REQUEST_GUILD_MEMBERS  # 8 - Request members
 ## Event Categories
 
 ### Connection Events
+
 - `HELLO` - Initial connection, contains heartbeat interval
 - `READY` - Successful handshake, contains session info
 - `RESUMED` - Session resumed after disconnect
 
 ### Channel Events
+
 - `CHANNEL_CREATE`, `CHANNEL_UPDATE`, `CHANNEL_DELETE`
 - `THREAD_CREATE`, `THREAD_UPDATE`, `THREAD_DELETE`
 - `CHANNEL_PINS_UPDATE`
 
 ### Guild Events
+
 - `GUILD_CREATE`, `GUILD_UPDATE`, `GUILD_DELETE`
 - `GUILD_MEMBER_ADD`, `GUILD_MEMBER_UPDATE`, `GUILD_MEMBER_REMOVE`
 - `GUILD_ROLE_CREATE`, `GUILD_ROLE_UPDATE`, `GUILD_ROLE_DELETE`
 - `GUILD_BAN_ADD`, `GUILD_BAN_REMOVE`
 
 ### Message Events
+
 - `MESSAGE_CREATE`, `MESSAGE_UPDATE`, `MESSAGE_DELETE`
 - `MESSAGE_REACTION_ADD`, `MESSAGE_REACTION_REMOVE`
 
 ### Voice Events
+
 - `VOICE_STATE_UPDATE` - User voice state changes
 - `VOICE_SERVER_UPDATE` - Voice server updates
 
 ### Presence Events
+
 - `PRESENCE_UPDATE` - User presence/status changes
 - `TYPING_START` - User starts typing
 
 ## Best Practices
 
 ### Gateway Connection Management
+
 1. **Cache the Gateway URL** - Store and reuse the URL from `Get Gateway Bot`
 2. **Handle Disconnects** - Implement proper resume logic using `resume_gateway_url`
 3. **Heartbeat Timing** - Use jitter on first heartbeat: `heartbeat_interval * random(0, 1)`
@@ -231,11 +256,13 @@ GatewayOpcode.REQUEST_GUILD_MEMBERS  # 8 - Request members
 5. **Sharding** - Shard connections for bots in 2500+ guilds
 
 ### Intent Selection
+
 1. **Minimize Intents** - Only request intents your app needs
 2. **Privileged Intents** - Apply for approval if required
 3. **Message Content** - Only request if absolutely necessary
 
 ### Event Handling
+
 1. **Sequence Numbers** - Track sequence numbers for resuming
 2. **State Caching** - Cache relevant data to minimize API calls
 3. **Error Handling** - Gracefully handle malformed or unexpected events
@@ -274,6 +301,7 @@ def create_identify(token: str, intents: int) -> IdentifyStructure:
 ## Contributing
 
 When adding new event types:
+
 1. Follow the existing naming conventions
 2. Include full documentation with Discord API references
 3. Mark optional fields with `total=False` in TypedDict
