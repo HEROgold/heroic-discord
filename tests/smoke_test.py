@@ -20,13 +20,13 @@ def main() -> int:
         print("✓ All smoke tests passed")
 
     except ImportError as e:
-        print(f"✗ Failed to import package: {e}", file=sys.stderr)
+        print(f"✗ Failed to import package: {e}")
         return 1
     except AssertionError as e:
-        print(f"✗ Assertion failed: {e}", file=sys.stderr)
+        print(f"✗ Assertion failed: {e}")
         return 1
     except Exception as e:
-        print(f"✗ Unexpected error: {e}", file=sys.stderr)
+        print(f"✗ Unexpected error: {e}")
         return 1
     else:
         return 0

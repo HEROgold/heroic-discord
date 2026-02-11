@@ -1,15 +1,24 @@
 # Ruff configuration
 # https://docs.astral.sh/ruff/
 
-# Enable all rules by default
 lint.select = ["ALL"]
-
-# Set line length
 line-length = 100
-
-# Python version
 target-version = "py314"
 
 [lint.per-file-ignores]
-# Disable print (T201) and assert (S101) checks in tests
-"tests/**" = ["T201", "S101"]
+"tests/**" = [
+    "T201", # print
+    "S101", # assert
+    "S106", # hardcoded password
+    "PLR2004", # magic values
+    "INP001" # implicit namespace package
+]
+
+"examples/**" = [
+    "INP001", # implicit namespace package
+    "T201", # print
+    "ERA001", # commented-out code
+    "S106" # hardcoded password
+]
+
+"src/heroic_discord/typing/**" = ["INP001"]
